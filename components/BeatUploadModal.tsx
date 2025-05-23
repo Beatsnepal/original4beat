@@ -39,10 +39,20 @@ export const BeatUploadModal: React.FC<BeatUploadModalProps> = ({ isOpen, onClos
   const handleCoverArtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setCoverArt(file);
+
+      // Check image ratio (1:1)
       const reader = new FileReader();
       reader.onload = (event) => {
-        setCoverArtPreview(event.target?.result as string);
+        const img = new Image();
+        img.onload = () => {
+          if (img.width !== img.height) {
+            alert('Please upload a 1:1 square ratio image for cover art.');
+            return;
+          }
+          setCoverArt(file);
+          setCoverArtPreview(event.target?.result as string);
+        };
+        img.src = event.target?.result as string;
       };
       reader.readAsDataURL(file);
     }
@@ -136,7 +146,7 @@ export const BeatUploadModal: React.FC<BeatUploadModalProps> = ({ isOpen, onClos
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-      <div className="relative w-full max-w-xl rounded-2xl bg-white shadow-xl p-6">
+      <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-xl p-6">
         <button
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-800 transition"
           onClick={onClose}
@@ -195,7 +205,7 @@ export const BeatUploadModal: React.FC<BeatUploadModalProps> = ({ isOpen, onClos
             onChange={(e) => setUploader(e.target.value)}
           />
           <div>
-            <label className="block text-sm mb-1 font-medium text-gray-600">Upload Cover Art</label>
+            <label className="block text-sm mb-1 font-medium text-gray-600">Upload Cover Art (1:1 only)</label>
             <input
               type="file"
               accept="image/*"
@@ -203,7 +213,7 @@ export const BeatUploadModal: React.FC<BeatUploadModalProps> = ({ isOpen, onClos
               className="w-full"
             />
             {coverArtPreview && (
-              <img src={coverArtPreview} alt="Cover Art Preview" className="mt-2 rounded-lg w-full h-auto" />
+              <img src={coverArtPreview} alt="Cover Art Preview" className="mt-2 rounded-lg w-full max-w-xs aspect-square object-cover mx-auto" />
             )}
           </div>
           <div>
