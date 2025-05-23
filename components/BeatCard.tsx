@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Play, Pause, Phone, MoreVertical, X } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
@@ -15,6 +14,7 @@ interface Beat {
   coverArt: string;
   audioUrl: string;
   producerPhone: string;
+  qr_url?: string;
 }
 
 interface BeatCardProps {
@@ -59,9 +59,13 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
   const isOwner = beat.phone === storedPhone;
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden relative hover:shadow-2xl transition-all duration-200 w-full max-w-xs sm:max-w-full mx-auto">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden relative hover:shadow-2xl transition-all duration-200 w-full">
       <div className="aspect-square w-full bg-blue-100 relative">
-        <img src={beat.coverArt} alt={beat.name} className="w-full h-full object-cover rounded-t-xl" />
+        <img
+          src={beat.coverArt}
+          alt={beat.name}
+          className="w-full h-full object-cover rounded-t-xl"
+        />
         <span className="absolute top-2 right-2 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
           NPR {beat.price}
         </span>
@@ -70,14 +74,21 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
       <div className="p-4 flex flex-col justify-between h-48">
         <div className="flex justify-between items-start mb-2">
           <div className="space-y-1">
-            <h3 className="text-xl font-bold text-blue-900 leading-snug">{beat.name}</h3>
+            <h3 className="text-xl font-bold text-blue-900 leading-snug">
+              {beat.name}
+            </h3>
             <p className="text-sm text-gray-600 font-medium">{beat.uploader}</p>
-            <p className="text-sm text-blue-700 tracking-wide">{beat.key} • {beat.bpm} BPM</p>
+            <p className="text-sm text-blue-700 tracking-wide">
+              {beat.key} • {beat.bpm} BPM
+            </p>
           </div>
 
           {isOwner && (
             <div className="relative">
-              <button onClick={() => setMenuOpen(!menuOpen)} className="text-blue-500 hover:text-blue-700">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="text-blue-500 hover:text-blue-700"
+              >
                 <MoreVertical size={20} />
               </button>
               {menuOpen && (
@@ -134,20 +145,33 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
 
       {showCallPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-green-600 text-white p-6 rounded-xl shadow-lg text-center relative w-11/12 max-w-sm mx-auto">
+          <div className="bg-white text-gray-800 p-6 rounded-xl shadow-xl text-center relative w-11/12 max-w-sm mx-auto">
             <button
-              className="absolute top-2 right-2 text-white hover:text-gray-200"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
               onClick={() => setShowCallPopup(false)}
             >
               <X size={20} />
             </button>
-            <p className="text-lg font-semibold">📞 Call the producer:</p>
+            <p className="text-lg font-semibold mb-2">📞 Call the producer:</p>
             <a
               href={`tel:${beat.producerPhone}`}
-              className="block mt-4 text-xl font-bold underline"
+              className="block mb-4 text-xl font-bold text-blue-700 underline"
             >
               {beat.producerPhone}
             </a>
+
+            {beat.qr_url && (
+              <>
+                <p className="text-sm text-gray-600 mb-2">
+                  Scan QR to pay or save contact:
+                </p>
+                <img
+                  src={beat.qr_url}
+                  alt="QR Code"
+                  className="mx-auto w-40 h-40 rounded-lg shadow-md"
+                />
+              </>
+            )}
           </div>
         </div>
       )}
