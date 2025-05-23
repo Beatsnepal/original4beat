@@ -3,155 +3,107 @@
 import React, { useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { supabase } from '@/lib/supabaseClient';
-import { EditBeatModal } from '@/components/EditBeatModal';
 
-export default function Page() {
+interface Expert {
+  id: number;
+  user_id: string;
+  name: string;
+  experience: string;
+  price: string;
+  delivery_time: string;
+  phone: string;
+  youtube1: string;
+  youtube2: string;
+}
+
+export default function MyProfilePage() {
   const [user, setUser] = useState<any>(null);
-  const [beats, setBeats] = useState<any[]>([]);
+  const [experts, setExperts] = useState<Expert[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBeat, setSelectedBeat] = useState<any>(null);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-
-  const refreshBeats = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('beats')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (!error && data) setBeats(data);
-  };
 
   useEffect(() => {
     const fetchData = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user;
+      const currentUser = session?.user;
 
-      if (!user) {
+      if (!currentUser) {
         window.location.href = "/signin";
         return;
       }
 
-      setUser(user);
-      await refreshBeats(user.id);
+      setUser(currentUser);
+      await fetchExperts(currentUser.id);
       setLoading(false);
     };
 
     fetchData();
   }, []);
 
-  const handleDelete = async (id: number) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this beat?");
-    if (!confirmDelete) return;
+  const fetchExperts = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('experts')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
 
-    const { error } = await supabase.from('beats').delete().eq('id', id);
+    if (!error && data) setExperts(data);
+  };
+
+  const handleDelete = async (id: number) => {
+    const confirm = window.confirm("Are you sure you want to delete this expert?");
+    if (!confirm) return;
+
+    const { error } = await supabase.from('experts').delete().eq('id', id);
     if (!error && user) {
-      await refreshBeats(user.id);
-      alert("Beat deleted!");
+      await fetchExperts(user.id);
     }
   };
 
   return (
     <>
       <Navbar onUploadClick={() => {}} />
-      <section className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-white py-16 px-6">
+      <section className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-white px-6 py-12">
         <div className="max-w-6xl mx-auto">
-          {/* Profile Header */}
-          <div className="flex flex-col md:flex-row justify-between items-center bg-white shadow-md rounded-xl px-6 py-6 mb-10">
-            <h2 className="text-3xl sm:text-4xl font-bold text-blue-900 mb-4 md:mb-0">
-              🎧 My Profile
-            </h2>
-            {user && (
-              <p className="text-md sm:text-lg text-blue-700 font-medium">
-                Logged in as <span className="font-semibold">{user.email}</span>
-              </p>
-            )}
-          </div>
+          <h1 className="text-4xl font-bold text-blue-900 mb-6">My Profile</h1>
 
-          {/* Content */}
           {loading ? (
-            <p className="text-center text-blue-400 text-lg">Loading your beats...</p>
-          ) : beats.length === 0 ? (
-            <p className="text-center text-blue-400 text-lg">You haven't uploaded any beats yet.</p>
+            <p className="text-blue-500">Loading...</p>
+          ) : experts.length === 0 ? (
+            <p className="text-blue-500">You haven't uploaded any experts yet.</p>
           ) : (
-            <div className="overflow-x-auto rounded-xl shadow border border-blue-100 bg-white">
-              <audio id="profile-audio" className="hidden" />
-
-              <table className="min-w-full divide-y divide-blue-100 text-sm sm:text-base">
-                <thead className="bg-blue-600 text-white text-left">
-                  <tr>
-                    <th className="px-4 py-3">#</th>
-                    <th className="px-4 py-3">Track</th>
-                    <th className="px-4 py-3">Key & BPM</th>
-                    <th className="px-4 py-3">Price</th>
-                    <th className="px-4 py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {beats.map((beat, index) => (
-                    <tr key={beat.id} className="hover:bg-blue-50 transition">
-                      <td className="px-4 py-3 text-gray-700">{index + 1}</td>
-                      <td className="px-4 py-3 font-medium text-blue-800 flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            const audio = document.getElementById('profile-audio') as HTMLAudioElement;
-                            const playIcon = document.getElementById(`icon-${beat.id}`);
-                            if (audio.src !== beat.audio_url) {
-                              audio.src = beat.audio_url;
-                              audio.play();
-                              if (playIcon) playIcon.textContent = "⏸️";
-                              audio.onended = () => { if (playIcon) playIcon.textContent = "▶️"; };
-                            } else if (audio.paused) {
-                              audio.play();
-                              if (playIcon) playIcon.textContent = "⏸️";
-                            } else {
-                              audio.pause();
-                              if (playIcon) playIcon.textContent = "▶️";
-                            }
-                          }}
-                          className="text-xl text-blue-600 hover:text-blue-800"
-                          style={{ background: "none", border: "none" }}
-                        >
-                          <span id={`icon-${beat.id}`}>▶️</span>
-                        </button>
-                        {beat.name}
-                      </td>
-                      <td className="px-4 py-3 text-blue-700">{beat.key} • {beat.bpm} BPM</td>
-                      <td className="px-4 py-3 text-blue-700">Rs {beat.price}</td>
-                      <td className="px-4 py-3 space-x-2">
-                        <button
-                          onClick={() => {
-                            setSelectedBeat(beat);
-                            setIsEditOpen(true);
-                          }}
-                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm px-3 py-1 rounded shadow"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(beat.id)}
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm px-3 py-1 rounded shadow"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {experts.map((expert) => (
+                <div key={expert.id} className="bg-white rounded-2xl shadow-md border border-blue-100 p-6 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-blue-900 mb-1">{expert.name}</h3>
+                    <p className="text-sm text-gray-700 mb-1">🎧 <strong>Experience:</strong> {expert.experience} years</p>
+                    <p className="text-sm text-gray-700 mb-1">💰 <strong>Price:</strong> NPR {expert.price}</p>
+                    <p className="text-sm text-gray-700 mb-2">⏱️ <strong>Delivery:</strong> {expert.delivery_time}</p>
+                    <div className="mb-3 space-y-1">
+                      <a href={expert.youtube1} target="_blank" className="text-blue-600 text-sm underline block">▶ Sample Link 1</a>
+                      <a href={expert.youtube2} target="_blank" className="text-blue-600 text-sm underline block">▶ Sample Link 2</a>
+                    </div>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <button
+                      onClick={() => handleDelete(expert.id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow text-sm"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => alert('Edit functionality coming soon')}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow text-sm"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
       </section>
-
-      {isEditOpen && selectedBeat && (
-        <EditBeatModal
-          isOpen={isEditOpen}
-          onClose={() => setIsEditOpen(false)}
-          beat={selectedBeat}
-          onUpdate={() => user && refreshBeats(user.id)}
-        />
-      )}
     </>
   );
 }

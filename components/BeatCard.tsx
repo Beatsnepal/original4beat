@@ -68,12 +68,12 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
         </span>
       </div>
 
-      <div className="p-4">
+      <div className="p-4 flex flex-col justify-between h-48">
         <div className="flex justify-between items-start mb-2">
-          <div>
-            <h3 className="text-lg font-semibold text-blue-900 truncate">{beat.name}</h3>
-            <p className="text-sm text-blue-700">{beat.uploader}</p>
-            <p className="text-sm text-blue-500">{beat.key} • {beat.bpm} BPM</p>
+          <div className="space-y-1">
+            <h3 className="text-xl font-bold text-blue-900 leading-snug">{beat.name}</h3>
+            <p className="text-sm text-gray-600 font-medium">{beat.uploader}</p>
+            <p className="text-sm text-blue-700 tracking-wide">{beat.key} • {beat.bpm} BPM</p>
           </div>
 
           {isOwner && (
@@ -108,7 +108,7 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center justify-between mt-4 pt-2 border-t">
           <button
             onClick={togglePlay}
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-medium flex items-center space-x-2 shadow"
