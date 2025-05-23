@@ -1,0 +1,5 @@
+{
+  "/page": "app/page.js",
+  "/mix-master/page": "app/mix-master/page.js",
+  "/my-profile/page": "app/my-profile/page.js"
+}
