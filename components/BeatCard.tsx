@@ -59,8 +59,7 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
   const isOwner = beat.phone === storedPhone;
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden relative hover:shadow-2xl transition-all duration-200 w-60 flex-shrink-0 sm:w-full">
-      {/* Cover Art */}
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden relative hover:shadow-2xl transition-all duration-200 w-full max-w-xs sm:max-w-full mx-auto">
       <div className="aspect-square w-full bg-blue-100 relative">
         <img src={beat.coverArt} alt={beat.name} className="w-full h-full object-cover rounded-t-xl" />
         <span className="absolute top-2 right-2 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
@@ -108,7 +107,7 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-4 pt-2 border-t">
+        <div className="flex flex-wrap gap-2 items-center justify-between mt-4 pt-2 border-t">
           <button
             onClick={togglePlay}
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-medium flex items-center space-x-2 shadow"
@@ -133,10 +132,9 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
         hidden
       />
 
-      {/* Call Popup */}
       {showCallPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-green-600 text-white p-6 rounded-xl shadow-lg text-center relative w-72">
+          <div className="bg-green-600 text-white p-6 rounded-xl shadow-lg text-center relative w-11/12 max-w-sm mx-auto">
             <button
               className="absolute top-2 right-2 text-white hover:text-gray-200"
               onClick={() => setShowCallPopup(false)}
