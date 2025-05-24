@@ -13,6 +13,7 @@ interface Beat {
   uploader: string;
   cover_url: string;
   audio_url: string;
+  qr_url?: string; // ✅ Included for QR code support
 }
 
 interface BeatsSectionProps {
@@ -27,7 +28,7 @@ export const BeatsSection: React.FC<BeatsSectionProps> = ({ onUploadClick }) => 
     const fetchBeats = async () => {
       const { data, error } = await supabase
         .from('beats')
-        .select('*')
+        .select('*') // ✅ Assumes qr_url is included in your DB schema
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -86,8 +87,8 @@ export const BeatsSection: React.FC<BeatsSectionProps> = ({ onUploadClick }) => 
         ) : beats.length === 0 ? (
           <p className="text-center text-gray-500">No beats uploaded yet.</p>
         ) : (
-          <div className="bg-white border border-blue-300 rounded-2xl shadow-md p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="bg-white border border-blue-300 rounded-2xl shadow-md p-4">
+            <div className="flex overflow-x-auto space-x-4 pb-4 snap-x snap-mandatory scrollbar-hide">
               {beats.map((beat) => (
                 <BeatCard
                   key={beat.id}
@@ -101,7 +102,8 @@ export const BeatsSection: React.FC<BeatsSectionProps> = ({ onUploadClick }) => 
                     uploader: beat.uploader,
                     coverArt: beat.cover_url,
                     audioUrl: beat.audio_url,
-                    producerPhone: beat.phone
+                    producerPhone: beat.phone,
+                    qr_url: beat.qr_url // ✅ Make sure this gets passed down
                   }}
                 />
               ))}
