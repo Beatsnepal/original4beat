@@ -13,7 +13,7 @@ const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
   const [user, setUser] = useState<any>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const isAdmin = true; // forced for testing
+  const isAdmin = user && user.email === 'beatsnepal74@gmail.com';
 
   useEffect(() => {
     const getUser = async () => {
@@ -58,8 +58,8 @@ const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
           <Link href="/mix-master" className="hover:text-blue-200 transition-colors">Mix and Master</Link>
           <Link href="/album-sell" className="hover:text-blue-200 transition-colors">Albums</Link>
           <Link href="/my-profile" className="hover:text-blue-200 transition-colors">My Profile</Link>
-          {isAdmin && (
-            <Link href="/admin-dashboard" className="hover:text-yellow-300 transition-colors">
+          {user !== null && isAdmin && (
+            <Link href="/admin/dashboard" className="hover:text-yellow-300 transition-colors">
               Admin
             </Link>
           )}
@@ -92,8 +92,8 @@ const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
           <Link href="/mix-master" onClick={() => setMenuOpen(false)}>Mix and Master</Link>
           <Link href="/album-sell" onClick={() => setMenuOpen(false)}>Albums</Link>
           <Link href="/my-profile" onClick={() => setMenuOpen(false)}>My Profile</Link>
-          {isAdmin && (
-            <Link href="/admin-dashboard" onClick={() => setMenuOpen(false)} className="text-yellow-300">
+          {user !== null && isAdmin && (
+            <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} className="text-yellow-300">
               Admin
             </Link>
           )}

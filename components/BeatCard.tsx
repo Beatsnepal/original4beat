@@ -1,7 +1,8 @@
+// BeatCard.tsx
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { Play, Pause, Phone, MoreVertical, X, Link } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Play as PlayIcon, Pause as PauseIcon, Phone, MoreVertical, X, Link } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { EditBeatModal } from './EditBeatModal';
 
@@ -24,6 +25,9 @@ interface BeatCardProps {
   showCopyLink?: boolean;
 }
 
+let currentPlayingAudio: HTMLAudioElement | null = null;
+let currentSetIsPlaying: ((playing: boolean) => void) | null = null;
+
 const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete, showCopyLink = true }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -34,13 +38,24 @@ const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete, showCopyLink = true
   const [copySuccess, setCopySuccess] = useState(false);
 
   const togglePlay = () => {
-    if (audioRef.current) {
-      if (audioRef.current.paused) {
-        audioRef.current.play();
-        setIsPlaying(true);
-      } else {
-        audioRef.current.pause();
-        setIsPlaying(false);
+    if (!audioRef.current) return;
+
+    if (audioRef.current.paused) {
+      if (currentPlayingAudio && currentPlayingAudio !== audioRef.current) {
+        currentPlayingAudio.pause();
+        if (currentSetIsPlaying) currentSetIsPlaying(false);
+      }
+
+      audioRef.current.play();
+      setIsPlaying(true);
+      currentPlayingAudio = audioRef.current;
+      currentSetIsPlaying = setIsPlaying;
+    } else {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      if (currentPlayingAudio === audioRef.current) {
+        currentPlayingAudio = null;
+        currentSetIsPlaying = null;
       }
     }
   };
@@ -98,7 +113,7 @@ const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete, showCopyLink = true
           onClick={togglePlay}
           className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-full text-sm flex items-center space-x-1"
         >
-          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+          {isPlaying ? <PauseIcon size={16} /> : <PlayIcon size={16} />}
           <span>{isPlaying ? 'Pause' : 'Play'}</span>
         </button>
 
@@ -147,7 +162,13 @@ const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete, showCopyLink = true
       <audio
         ref={audioRef}
         src={beat.audioUrl}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={() => {
+          setIsPlaying(false);
+          if (currentPlayingAudio === audioRef.current) {
+            currentPlayingAudio = null;
+            currentSetIsPlaying = null;
+          }
+        }}
         hidden
       />
 
