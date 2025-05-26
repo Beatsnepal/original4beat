@@ -246,3 +246,6 @@ export const BeatUploadModal: React.FC<BeatUploadModalProps> = ({ isOpen, onClos
     </div>
   );
 };
+
+
+export default BeatUploadModal;

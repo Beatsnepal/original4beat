@@ -40,3 +40,7 @@ export const FounderSection: React.FC = () => {
     </section>
   );
 };
+
+
+export default FounderSection;
+

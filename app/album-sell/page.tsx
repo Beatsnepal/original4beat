@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import AlbumCard from '@/components/AlbumCard';
 import UploadAlbumModal from '@/components/UploadAlbumModal';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 export default function AlbumSellPage() {
   const [albums, setAlbums] = useState<any[]>([]);

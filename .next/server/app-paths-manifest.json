@@ -1,3 +1,9 @@
 {
-  "/page": "app/page.js"
+  "/not-found": "app/not-found.js",
+  "/admin/dashboard/page": "app/admin/dashboard/page.js",
+  "/signin/page": "app/signin/page.js",
+  "/mix-master/page": "app/mix-master/page.js",
+  "/page": "app/page.js",
+  "/my-profile/page": "app/my-profile/page.js",
+  "/album-sell/page": "app/album-sell/page.js"
 }

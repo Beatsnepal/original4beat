@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
-import { BeatCard } from './BeatCard';
+import BeatCard from './BeatCard';
 import { supabase } from '../lib/supabaseClient';
 import { Play } from 'lucide-react';
 
@@ -13,7 +14,6 @@ interface Beat {
   uploader: string;
   cover_url: string;
   audio_url: string;
-  qr_url?: string; // ✅ Included for QR code support
 }
 
 interface BeatsSectionProps {
@@ -28,7 +28,7 @@ export const BeatsSection: React.FC<BeatsSectionProps> = ({ onUploadClick }) => 
     const fetchBeats = async () => {
       const { data, error } = await supabase
         .from('beats')
-        .select('*') // ✅ Assumes qr_url is included in your DB schema
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -51,7 +51,6 @@ export const BeatsSection: React.FC<BeatsSectionProps> = ({ onUploadClick }) => 
         background: 'linear-gradient(to bottom right, #e0f2fe, #ffffff)',
       }}
     >
-      {/* Floating Music Notes */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <svg className="absolute top-10 left-10 w-16 h-16 opacity-10" fill="#3b82f6" viewBox="0 0 24 24">
           <path d="M9 17.5V6.4l11-2v11.1a3.5 3.5 0 1 1-2-3.1V7.4l-7 1.3v8.8a3.5 3.5 0 1 1-2 3z" />
@@ -64,7 +63,6 @@ export const BeatsSection: React.FC<BeatsSectionProps> = ({ onUploadClick }) => 
         </svg>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-3">🎵 All Uploaded Beats</h2>
@@ -87,8 +85,8 @@ export const BeatsSection: React.FC<BeatsSectionProps> = ({ onUploadClick }) => 
         ) : beats.length === 0 ? (
           <p className="text-center text-gray-500">No beats uploaded yet.</p>
         ) : (
-          <div className="bg-white border border-blue-300 rounded-2xl shadow-md p-4">
-            <div className="flex overflow-x-auto space-x-4 pb-4 snap-x snap-mandatory scrollbar-hide">
+          <div className="bg-white border border-blue-300 rounded-2xl shadow-md p-6">
+            <div className="flex flex-col space-y-4">
               {beats.map((beat) => (
                 <BeatCard
                   key={beat.id}
@@ -103,7 +101,6 @@ export const BeatsSection: React.FC<BeatsSectionProps> = ({ onUploadClick }) => 
                     coverArt: beat.cover_url,
                     audioUrl: beat.audio_url,
                     producerPhone: beat.phone,
-                    qr_url: beat.qr_url // ✅ Make sure this gets passed down
                   }}
                 />
               ))}
@@ -114,3 +111,6 @@ export const BeatsSection: React.FC<BeatsSectionProps> = ({ onUploadClick }) => 
     </section>
   );
 };
+
+
+export default BeatsSection;

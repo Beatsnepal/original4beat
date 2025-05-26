@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Menu, X, Music } from 'lucide-react';
@@ -8,9 +9,11 @@ interface NavbarProps {
   onUploadClick: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
+const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
   const [user, setUser] = useState<any>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const isAdmin = true; // forced for testing
 
   useEffect(() => {
     const getUser = async () => {
@@ -37,13 +40,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
   return (
     <nav className="bg-blue-900 text-white shadow-md">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Left - Logo */}
         <div className="flex items-center space-x-2">
           <Music size={28} className="text-white" />
           <span className="font-bold text-xl tracking-tight">Beats 4 Nepal</span>
         </div>
 
-        {/* Hamburger Button */}
         <button
           className="md:hidden text-white focus:outline-none"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -51,13 +52,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
           {menuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
 
-        {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6">
           <Link href="/" className="hover:text-blue-200 transition-colors">Home</Link>
           <a href="#beats" className="hover:text-blue-200 transition-colors">Beats</a>
           <Link href="/mix-master" className="hover:text-blue-200 transition-colors">Mix and Master</Link>
           <Link href="/album-sell" className="hover:text-blue-200 transition-colors">Albums</Link>
           <Link href="/my-profile" className="hover:text-blue-200 transition-colors">My Profile</Link>
+          {isAdmin && (
+            <Link href="/admin-dashboard" className="hover:text-yellow-300 transition-colors">
+              Admin
+            </Link>
+          )}
           {!user && (
             <>
               <Link href="/signup" className="hover:text-blue-200 transition-colors">Sign Up</Link>
@@ -80,7 +85,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden flex flex-col space-y-4 px-4 pb-4">
           <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
@@ -88,6 +92,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
           <Link href="/mix-master" onClick={() => setMenuOpen(false)}>Mix and Master</Link>
           <Link href="/album-sell" onClick={() => setMenuOpen(false)}>Albums</Link>
           <Link href="/my-profile" onClick={() => setMenuOpen(false)}>My Profile</Link>
+          {isAdmin && (
+            <Link href="/admin-dashboard" onClick={() => setMenuOpen(false)} className="text-yellow-300">
+              Admin
+            </Link>
+          )}
           {!user && (
             <>
               <Link href="/signup" onClick={() => setMenuOpen(false)}>Sign Up</Link>
@@ -110,3 +119,5 @@ export const Navbar: React.FC<NavbarProps> = ({ onUploadClick }) => {
     </nav>
   );
 };
+
+export default Navbar;

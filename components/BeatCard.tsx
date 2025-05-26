@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Phone, MoreVertical, X } from 'lucide-react';
+'use client';
+
+import React, { useState, useRef } from 'react';
+import { Play, Pause, Phone, MoreVertical, X, Link } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { EditBeatModal } from './EditBeatModal';
 
@@ -14,78 +16,34 @@ interface Beat {
   coverArt: string;
   audioUrl: string;
   producerPhone: string;
-  qr_url?: string;
 }
 
 interface BeatCardProps {
   beat: Beat;
   onDelete?: () => void;
+  showCopyLink?: boolean;
 }
 
-export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
+const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete, showCopyLink = true }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [showCallPopup, setShowCallPopup] = useState(false);
   const [selectedBeat, setSelectedBeat] = useState<Beat | null>(null);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (audioRef.current.paused) {
-      window.dispatchEvent(new CustomEvent('beat-play', { detail: beat.id }));
-      audioRef.current.play();
-      setIsPlaying(true);
-    } else {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = parseFloat(e.target.value);
     if (audioRef.current) {
-      audioRef.current.currentTime = newTime;
-      setCurrentTime(newTime);
-    }
-  };
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60).toString().padStart(2, '0');
-    return `${minutes}:${seconds}`;
-  };
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const setAudioDuration = () => setDuration(audio.duration);
-
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', setAudioDuration);
-    audio.addEventListener('ended', () => setIsPlaying(false));
-
-    const stopOnOtherPlay = (e: any) => {
-      if (e.detail !== beat.id && audioRef.current) {
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+        setIsPlaying(true);
+      } else {
         audioRef.current.pause();
-        audioRef.current.currentTime = 0;
         setIsPlaying(false);
       }
-    };
-
-    window.addEventListener('beat-play', stopOnOtherPlay);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', setAudioDuration);
-      audio.removeEventListener('ended', () => setIsPlaying(false));
-      window.removeEventListener('beat-play', stopOnOtherPlay);
-    };
-  }, [beat.id]);
+    }
+  };
 
   const handleDelete = async () => {
     const confirmDelete = window.confirm("Are you sure you want to delete this beat?");
@@ -100,147 +58,119 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
     }
   };
 
-  const storedPhone = localStorage.getItem('userPhone');
+  const handleCopyLink = async () => {
+    try {
+      const url = `${window.location.origin}/beat/${beat.id}`;
+      await navigator.clipboard.writeText(url);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  };
+
+  const storedPhone = typeof window !== 'undefined' ? localStorage.getItem('userPhone') : null;
   const isOwner = beat.phone === storedPhone;
+  const copyBtnClass = `p-2 rounded-full transition-colors ${copySuccess ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`;
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden relative hover:shadow-xl transition-all duration-200 min-w-[200px] max-w-[200px] snap-start">
-      <div className="aspect-square w-full bg-blue-100 relative">
-        <img
-          src={beat.coverArt}
-          alt={beat.name}
-          className="w-full h-full object-cover rounded-t-xl"
-        />
-        <span className="absolute top-1 right-1 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
-          NPR {beat.price}
-        </span>
+    <div className="flex flex-wrap items-center bg-white rounded-2xl shadow-sm hover:shadow-md transition-all px-5 py-5 gap-4 w-full border border-blue-100">
+      <img src={beat.coverArt} alt={beat.name} className="w-20 h-20 rounded-lg object-cover" />
+
+      <div className="flex-1 min-w-[150px]">
+        <h3 title={beat.name} className="font-semibold text-blue-900 text-base sm:text-lg leading-snug break-words line-clamp-2">{beat.name}</h3>
+        <p className="text-sm text-gray-600 truncate">{beat.uploader}</p>
+        <p className="text-sm text-blue-700 tracking-wide">{beat.key} • {beat.bpm} BPM</p>
       </div>
 
-      <div className="p-3 flex flex-col justify-between">
-        {/* Header Info */}
-        <div className="flex justify-between items-start mb-1">
-          <div className="space-y-0.5">
-            <h3 className="text-sm font-semibold text-blue-900 leading-tight">{beat.name}</h3>
-            <p className="text-[11px] text-gray-600">{beat.uploader}</p>
-            <p className="text-[11px] text-blue-700">{beat.key} • {beat.bpm} BPM</p>
-          </div>
-
-          {isOwner && (
-            <div className="relative">
-              <button onClick={() => setMenuOpen(!menuOpen)} className="text-blue-500 hover:text-blue-700">
-                <MoreVertical size={14} />
-              </button>
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 bg-white shadow-md rounded z-10 w-24">
-                  <button
-                    className="block w-full text-left px-2 py-1 hover:bg-blue-100 text-[11px]"
-                    onClick={() => {
-                      setSelectedBeat(beat);
-                      setIsEditOpen(true);
-                      setMenuOpen(false);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="block w-full text-left px-2 py-1 hover:bg-red-100 text-[11px] text-red-600"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      handleDelete();
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* 1. Play Button */}
-        <div className="mt-2">
+      <div className="flex flex-wrap gap-2 items-center justify-end">
+        {showCopyLink && (
           <button
-            onClick={togglePlay}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center justify-center space-x-1 shadow"
+            onClick={handleCopyLink}
+            title={copySuccess ? 'Link copied!' : 'Copy link'}
+            className={copyBtnClass}
           >
-            {isPlaying ? <Pause size={14} /> : <Play size={14} />}
-            <span>{isPlaying ? 'Pause' : 'Play'}</span>
+            <Link size={16} />
           </button>
-        </div>
+        )}
 
-        {/* 2. Buy Button */}
-        <div className="mt-2">
-          <button
-            onClick={() => {
-              if (!beat.qr_url) {
-                alert("No QR code uploaded for this beat.");
-                return;
-              }
-              setShowCallPopup(true);
-            }}
-            className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center justify-center space-x-1 shadow"
-          >
-            <Phone size={14} />
-            <span>Buy</span>
-          </button>
-        </div>
+        <button
+          onClick={togglePlay}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-full text-sm flex items-center space-x-1"
+        >
+          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+          <span>{isPlaying ? 'Pause' : 'Play'}</span>
+        </button>
 
-        {/* 3. Audio Player */}
-        <div className="mt-3 border-t pt-2 flex flex-col space-y-1">
-          <input
-            type="range"
-            min={0}
-            max={duration}
-            step={0.1}
-            value={currentTime}
-            onChange={handleSeek}
-            className="w-full"
-          />
-          <div className="text-[10px] text-gray-500 flex justify-between">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
+        <button
+          onClick={() => setShowCallPopup(true)}
+          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-full text-sm flex items-center space-x-1"
+        >
+          <Phone size={16} />
+          <span>Buy</span>
+        </button>
+
+        <span className="bg-red-600 text-white text-xs px-3 py-1 rounded-full shadow font-semibold whitespace-nowrap">NPR {beat.price}</span>
+
+        {isOwner && (
+          <div className="relative">
+            <button onClick={() => setMenuOpen(!menuOpen)} className="text-blue-500 hover:text-blue-700">
+              <MoreVertical size={18} />
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 bg-white shadow-md rounded z-10 w-28">
+                <button
+                  className="block w-full text-left px-3 py-2 hover:bg-blue-100 text-sm"
+                  onClick={() => {
+                    setSelectedBeat(beat);
+                    setIsEditOpen(true);
+                    setMenuOpen(false);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  className="block w-full text-left px-3 py-2 hover:bg-red-100 text-sm text-red-600"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleDelete();
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </div>
 
-      <audio ref={audioRef} src={beat.audioUrl} hidden />
+      <audio
+        ref={audioRef}
+        src={beat.audioUrl}
+        onEnded={() => setIsPlaying(false)}
+        hidden
+      />
 
-      {/* QR Code Popup */}
       {showCallPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white text-gray-800 p-6 rounded-xl shadow-xl text-center relative w-11/12 max-w-sm mx-auto">
+          <div className="bg-green-600 text-white p-6 rounded-xl shadow-lg text-center relative w-72">
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+              className="absolute top-2 right-2 text-white hover:text-gray-200"
               onClick={() => setShowCallPopup(false)}
             >
               <X size={20} />
             </button>
-            <p className="text-lg font-semibold mb-2">📞 Call the producer:</p>
+            <p className="text-lg font-semibold">📞 Call the producer:</p>
             <a
               href={`tel:${beat.producerPhone}`}
-              className="block mb-4 text-xl font-bold text-blue-700 underline"
+              className="block mt-4 text-xl font-bold underline"
             >
               {beat.producerPhone}
             </a>
-            {beat.qr_url ? (
-              <>
-                <p className="text-sm text-gray-600 mb-2">
-                  Scan QR to pay or save contact:
-                </p>
-                <img
-                  src={beat.qr_url}
-                  alt="QR Code"
-                  className="mx-auto w-36 h-36 rounded-lg shadow-md"
-                />
-              </>
-            ) : (
-              <p className="text-sm text-red-500 mt-4">No QR code uploaded.</p>
-            )}
           </div>
         </div>
       )}
 
-      {/* Edit Modal */}
       {isEditOpen && selectedBeat && (
         <EditBeatModal
           isOpen={isEditOpen}
@@ -252,3 +182,5 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete }) => {
     </div>
   );
 };
+
+export default BeatCard;

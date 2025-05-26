@@ -65,3 +65,5 @@ export const MixingMasteringSection: React.FC<MixingMasteringSectionProps> = ({ 
     </section>
   );
 };
+
+export default MixingMasteringSection;
