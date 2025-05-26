@@ -1,15 +1,39 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import ExpertCardDisplay from "@/components/ExpertCardDisplay";
 
+type Beat = {
+  id: string;
+  name: string;
+  bpm: string;
+  key: string;
+  audio_path: string;
+};
+
+type Engineer = {
+  id: string;
+  name: string;
+  experience: string;
+  price?: string;
+  delivery_time?: string;
+  phone?: string;
+  youtube1?: string;
+  youtube2?: string;
+};
+
+type Album = {
+  id: string;
+  name: string;
+  artist: string;
+};
+
 export default function AdminDashboard() {
   const [userEmail, setUserEmail] = useState("");
-  const [beats, setBeats] = useState([]);
-  const [engineers, setEngineers] = useState([]);
-  const [albums, setAlbums] = useState([]);
+  const [beats, setBeats] = useState<Beat[]>([]);
+  const [engineers, setEngineers] = useState<Engineer[]>([]);
+  const [albums, setAlbums] = useState<Album[]>([]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -29,7 +53,7 @@ export default function AdminDashboard() {
 
     setBeats(beatsData || []);
 
-    const mappedEngineers = (engineerData || []).map((eng) => ({
+    const mappedEngineers: Engineer[] = (engineerData || []).map((eng) => ({
       id: eng.id,
       name: eng.name,
       experience: eng.experience,
@@ -44,12 +68,12 @@ export default function AdminDashboard() {
     setAlbums(albumData || []);
   };
 
-  const deleteFile = async (bucket, path) => {
+  const deleteFile = async (bucket: string, path: string) => {
     if (!path) return;
     await supabase.storage.from(bucket).remove([path]);
   };
 
-  const handleDelete = async (table, id, filePath, bucket) => {
+  const handleDelete = async (table: string, id: string, filePath?: string, bucket?: string) => {
     if (!confirm("Are you sure you want to delete this?")) return;
     const { error } = await supabase.from(table).delete().eq("id", id);
     if (!error && filePath && bucket) await deleteFile(bucket, filePath);
