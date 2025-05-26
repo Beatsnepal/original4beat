@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import supabase from '@/lib/supabaseClient';
 import ExpertCardDisplay from '@/components/cards/ExpertCardDisplay';
 
 type Expert = {
@@ -29,7 +29,8 @@ type Album = {
 };
 
 export default function DashboardPage() {
-  const supabase = createClient();
+  // const supabase = createClient();  // Replaced with direct import
+  const supabase = supabase;
   const [engineers, setEngineers] = useState<Expert[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
 
