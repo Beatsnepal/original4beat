@@ -30,6 +30,12 @@ interface Expert {
   id: string;
   name: string;
   userId: string;
+  experience: string;
+  price: string;
+  delivery_time: string;
+  phone: string;
+  youtube1: string;
+  youtube2: string;
 }
 
 export default function ProfilePage() {
@@ -88,8 +94,28 @@ export default function ProfilePage() {
       ];
 
       const allExperts: Expert[] = [
-        { id: 'e1', name: 'Mixing Pro', userId: 'user-123' },
-        { id: 'e2', name: 'Mastering Wizard', userId: 'user-456' },
+        {
+          id: 'e1',
+          name: 'Mixing Pro',
+          userId: 'user-123',
+          experience: '5',
+          price: '2000',
+          delivery_time: '2 days',
+          phone: '1234567890',
+          youtube1: 'https://youtube.com/sample1',
+          youtube2: 'https://youtube.com/sample2'
+        },
+        {
+          id: 'e2',
+          name: 'Mastering Wizard',
+          userId: 'user-456',
+          experience: '7',
+          price: '2500',
+          delivery_time: '3 days',
+          phone: '9876543210',
+          youtube1: 'https://youtube.com/sample3',
+          youtube2: 'https://youtube.com/sample4'
+        },
       ];
 
       const userBeats = allBeats.filter((b) => b.phone === sessionUser.phone);
@@ -119,7 +145,6 @@ export default function ProfilePage() {
 
   const handleSaveProfile = () => {
     if (user) {
-      // TODO: Save to backend
       setUser({ ...user, name: nameInput, profileImage: profileImagePreview });
       alert('Profile saved!');
     }
