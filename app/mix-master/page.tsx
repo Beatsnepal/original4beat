@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar'; // ✅ Fixed import
 import { supabase } from '@/lib/supabaseClient';
-import ExpertCardDisplay from '../../components/ExpertCardDisplay';
+import ExpertCardDisplay from '../../components/cards/ExpertCardDisplay';
 
 interface Expert {
   id?: number;

@@ -1,6 +1,7 @@
 {
+  "/not-found": "app/not-found.js",
   "/signin/page": "app/signin/page.js",
-  "/mix-master/page": "app/mix-master/page.js",
+  "/my-profile/page": "app/my-profile/page.js",
   "/page": "app/page.js",
-  "/my-profile/page": "app/my-profile/page.js"
+  "/admin/dashboard/page": "app/admin/dashboard/page.js"
 }
