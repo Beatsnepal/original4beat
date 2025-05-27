@@ -4,9 +4,17 @@ import { useEffect, useState } from "react";
 import { useUser } from "@supabase/auth-helpers-react";
 import { supabase } from "@/lib/supabaseClient";
 
+type Beat = {
+  id: number;
+  name: string;
+  key: string;
+  bpm: string;
+  audio_path: string;
+};
+
 export default function AdminDownloadPage() {
   const user = useUser();
-  const [beats, setBeats] = useState([]);
+  const [beats, setBeats] = useState<Beat[]>([]);
 
   const isAdmin = user?.email === "beatsnepal74@gmail.com";
 
@@ -23,7 +31,7 @@ export default function AdminDownloadPage() {
     }
   };
 
-  const handleDownload = async (path) => {
+  const handleDownload = async (path: string) => {
     if (!path) return alert("No audio file found.");
 
     const { data, error } = await supabase
