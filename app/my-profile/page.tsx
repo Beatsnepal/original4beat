@@ -26,7 +26,7 @@ interface Beat {
   producerPhone: string;
 }
 
-interface Expert {
+interface UserExpert {
   id: string;
   name: string;
   userId: string;
@@ -41,7 +41,7 @@ interface Expert {
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [beats, setBeats] = useState<Beat[]>([]);
-  const [experts, setExperts] = useState<Expert[]>([]);
+  const [experts, setExperts] = useState<UserExpert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [nameInput, setNameInput] = useState('');
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
@@ -215,7 +215,7 @@ export default function ProfilePage() {
                 {experts.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {experts.map((expert) => (
-                      <ExpertCard key={expert.id} expert={expert} />
+                      <ExpertCard key={expert.id} expert={expert as import('@/components/cards/ExpertCardDisplay').Expert} />
                     ))}
                   </div>
                 ) : (
