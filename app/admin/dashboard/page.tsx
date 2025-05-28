@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import BeatCard from '@/components/BeatCard';
 import ExpertCardDisplay from '@/components/cards/ExpertCardDisplay';
 
 interface Expert {
@@ -16,9 +17,23 @@ interface Expert {
   user_id?: string;
 }
 
+interface Beat {
+  id: number;
+  name: string;
+  key: string;
+  bpm: number;
+  price: number;
+  phone: string;
+  uploader: string;
+  coverArt: string;
+  audioUrl: string;
+  producerPhone: string;
+}
+
 export default function AdminDashboard() {
   const [experts, setExperts] = useState<Expert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [beats, setBeats] = useState<Beat[]>([]);
 
   useEffect(() => {
     const fetchExperts = async () => {
@@ -29,6 +44,12 @@ export default function AdminDashboard() {
     };
 
     fetchExperts();
+
+    const fetchBeats = async () => {
+      const { data } = await supabase.from('beats').select('*');
+      setBeats(data || []);
+    };
+    fetchBeats();
   }, []);
 
   const handleDeleteExpert = async (id: number) => {
@@ -68,6 +89,23 @@ export default function AdminDashboard() {
           ))}
         </div>
       )}
-    </div>
+    
+      <h2 className="text-2xl font-bold mt-10 mb-4 text-center">Uploaded Beats</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {beats.map((beat) => (
+          <div key={beat.id} className="relative">
+            <BeatCard beat={beat} onDelete={async () => {
+              const confirmDelete = window.confirm('Delete this beat?');
+              if (!confirmDelete) return;
+              const { error } = await supabase.from('beats').delete().eq('id', beat.id);
+              if (!error) {
+                setBeats((prev) => prev.filter((b) => b.id !== beat.id));
+                alert('Beat deleted');
+              }
+            }} showCopyLink={false} />
+          </div>
+        ))}
+      </div>
+</div>
   );
 }

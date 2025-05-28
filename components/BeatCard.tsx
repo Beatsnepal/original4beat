@@ -6,7 +6,7 @@ import { Play as PlayIcon, Pause as PauseIcon, Phone, MoreVertical, X, Link } fr
 import { supabase } from '../lib/supabaseClient';
 import { EditBeatModal } from './EditBeatModal';
 
-interface Beat {
+export interface Beat {
   id: number;
   name: string;
   key: string;
@@ -19,7 +19,7 @@ interface Beat {
   producerPhone: string;
 }
 
-interface BeatCardProps {
+export interface BeatCardProps {
   beat: Beat;
   onDelete?: () => void;
   showCopyLink?: boolean;
@@ -125,6 +125,15 @@ const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete, showCopyLink = true
           <span>Buy</span>
         </button>
 
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full text-sm"
+          >
+            Delete
+          </button>
+        )}
+
         <span className="bg-red-600 text-white text-xs px-3 py-1 rounded-full shadow font-semibold whitespace-nowrap">NPR {beat.price}</span>
 
         {isOwner && (
@@ -197,7 +206,7 @@ const BeatCard: React.FC<BeatCardProps> = ({ beat, onDelete, showCopyLink = true
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
           beat={selectedBeat}
-          onUpdate={onDelete}
+          onUpdate={onDelete ?? (() => {})}
         />
       )}
     </div>

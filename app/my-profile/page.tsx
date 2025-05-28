@@ -16,8 +16,8 @@ export default function ProfilePage() {
     profileImage: string | null;
   } | null>(null);
 
-  const [beats, setBeats] = useState([]);
-  const [experts, setExperts] = useState([]);
+  const [beats, setBeats] = useState<any[]>([]);
+  const [experts, setExperts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditExpertOpen, setIsEditExpertOpen] = useState(false);
   const [selectedExpert, setSelectedExpert] = useState(null);

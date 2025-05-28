@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Clock, Award, Phone, Link2, Check, X } from 'lucide-react';
 
@@ -11,13 +10,17 @@ interface Expert {
   phone: string;
   youtube1: string;
   youtube2: string;
+  user_id?: string;
 }
 
 interface ExpertCardProps {
   expert: Expert;
+  isOwner?: boolean;
+  onDelete: () => void;
+  onEdit: () => void;
 }
 
-const ExpertCardDisplay: React.FC<ExpertCardProps> = ({ expert }) => {
+const ExpertCardDisplay: React.FC<ExpertCardProps> = ({ expert, isOwner, onDelete, onEdit }) => {
   const [copied, setCopied] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
@@ -95,6 +98,23 @@ const ExpertCardDisplay: React.FC<ExpertCardProps> = ({ expert }) => {
               <Phone className="h-4 w-4 mr-2" />
               Call This Expert
             </button>
+
+            {isOwner && (
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={onEdit}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-md text-sm font-medium"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={onDelete}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-md text-sm font-medium"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

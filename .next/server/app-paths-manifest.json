@@ -1,7 +1,12 @@
 {
-  "/not-found": "app/not-found.js",
-  "/signin/page": "app/signin/page.js",
+  "/_not-found": "app/_not-found.js",
+  "/admin/dashboard/page": "app/admin/dashboard/page.js",
+  "/admin/download/page": "app/admin/download/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/album-sell/page": "app/album-sell/page.js",
   "/my-profile/page": "app/my-profile/page.js",
-  "/page": "app/page.js",
-  "/admin/dashboard/page": "app/admin/dashboard/page.js"
+  "/mix-master/page": "app/mix-master/page.js",
+  "/signup/page": "app/signup/page.js",
+  "/signin/page": "app/signin/page.js",
+  "/page": "app/page.js"
 }

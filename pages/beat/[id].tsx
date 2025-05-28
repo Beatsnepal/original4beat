@@ -2,12 +2,24 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+interface RawBeat {
+  id: number;
+  name: string;
+  key: string;
+  bpm: number;
+  price: number;
+  phone: string;
+  uploader: string;
+  cover_url: string;
+  audio_url: string;
+}
+import type { Beat } from '../../components/BeatCard';
 import BeatCard from '../../components/BeatCard';
 
 export default function BeatPage() {
   const router = useRouter();
   const { id } = router.query;
-  const [beat, setBeat] = useState(null);
+const [beat, setBeat] = useState<RawBeat | null>(null);
 
   useEffect(() => {
     if (!id) return;

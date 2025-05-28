@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { Session } from '@supabase/supabase-js';
 import { supabase } from "../lib/supabaseClient";
 
 export default function UploadAlbumModal() {
-  const [session, setSession] = useState(null);
+const [session, setSession] = useState<Session | null>(null);
   const [form, setForm] = useState({
     name: "",
     artist: "",
