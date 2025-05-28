@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import Navbar from '../../components/Navbar'; // ✅ Fixed import
+import Navbar from '../../components/Navbar';
 import { supabase } from '@/lib/supabaseClient';
 import ExpertCardDisplay from '../../components/cards/ExpertCardDisplay';
 
@@ -136,7 +136,13 @@ export default function MixMasterPage() {
 
         <div className="max-w-6xl mx-auto mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {experts.map((expert) => (
-            <ExpertCardDisplay key={expert.id} expert={expert} />
+            <ExpertCardDisplay
+              key={expert.id}
+              expert={expert}
+              isOwner={false}
+              onDelete={() => {}}
+              onEdit={() => {}}
+            />
           ))}
         </div>
       </section>
