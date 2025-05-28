@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,7 +8,14 @@ import EditExpertModal from '@/components/EditExpertModal';
 import { supabase } from '@/lib/supabaseClient';
 
 export default function ProfilePage() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<{
+    id: string;
+    email: string | undefined;
+    phone: string;
+    name: string;
+    profileImage: string | null;
+  } | null>(null);
+
   const [beats, setBeats] = useState([]);
   const [experts, setExperts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
