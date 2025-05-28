@@ -96,7 +96,7 @@ export default function ProfilePage() {
             <>
               <div className="bg-white rounded-xl p-6 shadow-md mb-8">
                 <p className="text-blue-900 text-lg font-semibold">
-                  Signed in as: <span className="text-blue-700">{user?.email}</span>
+                  Signed in as: <span className="text-blue-700">{user?.name || user?.email}</span>
                 </p>
               </div>
 
